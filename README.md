@@ -1,6 +1,6 @@
 Stand-in for a TODO list currently.
 
-Wondering if there's a way to optimize the brute-force techniques employed to test the 3n+1 (collat) testing.
+Wondering if there's a way to optimize the brute-force techniques employed to test the 3n+1 (collatz) testing.
 
 As of this writing (2021) the space tested was 0 - 2^68 (2.95 x 10^20, or simply 2.95e20), and the documented rates (in tests/sec) of computation were:
 * 1.31 x 10^12  (GPU-based, 64-bit int)

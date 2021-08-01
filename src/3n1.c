@@ -50,11 +50,15 @@ void single(uint128_t val) {
 int main(int argc, char **argv) {
   // Let's make it work first.
   Options opts = process_options(argc, argv);
+  printf("Start is ");
   print128(opts.start);
-  //printf("Start: %"PRIu64"  End: %"PRIu64"\n", opts.start, opts.end);
+  printf(".  End is ");
+  print128(opts.end);
+  printf("\n");
 
   // Single Test
   if(opts.mode == SINGLE_MODE) {
+    printf("Performing a SINGLE_MODE test.\n");
     single(opts.start);
     exit(0);
   }

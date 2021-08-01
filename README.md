@@ -23,6 +23,9 @@ The goal of this project is as much about optimization as it is about an old mat
 * Parallelize the work, each test (number) is atomic.  And our assumption below (about testing lower numbers) is proved when each block completes.
 * Stop testing down to 1, there are better sentinal tests.  E.g.: we only need to test if we've hit a power of two.
 * Don't process numbers we've already tested below "x".  E.g.: 3x+1 always gets halved, and if its even again, we're done, we don't even need to halve it (we've tested that number).
+* I'm not convinced we need to test even starting numbers.  If I test 1-10 manually, then test 11-20, I know that 12, 14, 16, 18, and 20 will all boil down to
+values I've already confirmed (6, 7, 8, 9, and 10, respectively).  When I move on to 21-30, same: 22, 24, 26, 28, and 30 have been tested either directly in
+the previous pass (11, 13, 15) or by virtue (12, 14 which were tested via 6, 7).
 * Treat all numbers that are multiplied by 3x+1 as a group of "initialization points", and upon discovering we reach 1, they will ALL reach 1. E.g.:
   * Start with 7 (put 7 in IP group => [7])
   * 7 * 3 + 1 == 22
@@ -43,4 +46,3 @@ The goal of this project is as much about optimization as it is about an old mat
   * 2 / 2 == 1  (STOP)
   * All numbers in our IP group will reach 1 eventually: [5, 7, 11, 13, 17].  They do not need tested individually.
   * Note: this might become inefficient to track as numbers get larger and as duplicates are found from previous iterations of X.
-

@@ -25,11 +25,13 @@ The goal of this project is as much about optimization as it is about an old mat
 * Don't process numbers we've already tested below "x".  E.g.: 3x+1 always gets halved, and if its even again, we're done, we don't even need to halve it (we've tested that number).
 * I'm not convinced we need to test even starting numbers.  If I test 1-10 manually, then test 11-20, I know that 12, 14, 16, 18, and 20 will all boil down to
 values I've already confirmed (6, 7, 8, 9, and 10, respectively).  When I move on to 21-30, same: 22, 24, 26, 28, and 30 have been tested either directly in
-the previous pass (11, 13, 15) or by virtue (12, 14 which were tested via 6, 7).
+the previous pass because they were odds (11, 13, 15) or by virtue (12, 14 which were tested via 6, 7).  In short, as long as we've scanned all the odds
+leading up to N, we've inevitably scanned all the evens (N/2) _and_ all the evens of double that value: 2N (because 2N is always even which immediately
+results in us dividing by 2, taking us back to N).
 * Treat all numbers that are multiplied by 3x+1 as a group of "initialization points", and upon discovering we reach 1, they will ALL reach 1. E.g.:
   * Start with 7 (put 7 in IP group => [7])
   * 7 * 3 + 1 == 22
-  * 22 / 2 == 11 (not even, add to IP group => [7,11])
+  * 22 / 2 == 11 (not even, add to IP group => [7, 11])
   * 11 * 3 + 1 == 34
   * 34 / 2 == 17 (not even, add to IP group => [7, 11, 17])
   * 17 * 3 + 1 == 52
@@ -38,11 +40,13 @@ the previous pass (11, 13, 15) or by virtue (12, 14 which were tested via 6, 7).
   * 13 * 3 + 1 == 40
   * 40 / 2 == 20
   * 20 / 2 == 10
-  * 10 / 2 == 5 (not even, add to IP group => [5, 7, 11, 13, 17])
+  * 10 / 2 == 5 (not even, add to IP group => [5, 7, 11, 13, 17]) (also, we could stop here since 5 < x, see above)
   * 5 * 3 + 1 == 16  (we could stop here because 16 is a power of two, see above)
   * 16 / 2 == 8
   * 8 / 2 == 4
   * 4 / 2 == 2
   * 2 / 2 == 1  (STOP)
   * All numbers in our IP group will reach 1 eventually: [5, 7, 11, 13, 17].  They do not need tested individually.
-  * Note: this might become inefficient to track as numbers get larger and as duplicates are found from previous iterations of X.
+  * Note: this might become inefficient to track as numbers get larger and as duplicates are found from previous iterations of X.  However
+    we might avoid this if we chunk up the ranges reasonably and put them in a sorted datastructure (vla-ish, skiplist, etc) that will give us
+    reasonable search performance (reasonable meaning, better to check each time than brute force everything).

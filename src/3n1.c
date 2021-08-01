@@ -6,9 +6,9 @@
 
 
 
+//
+// A basic, inefficient way to test a single number.  This is the loop I see most people using, when they're not busy abusing recursion ...
 int inefficient(uint128_t val) {
-  // The conjecture states we must start with 3x+1, but most implementations I see keep looping over an if..else block.
-  // We could add an assumption about 3x+1 at the top of a while() loop, but we'll purposely use the if..else method others do for testing.
   while(val != 1) {
     if(val % 2 == 0) {
       // It's even, so divided by 2.
@@ -47,6 +47,7 @@ void single(uint128_t val) {
 
 
 
+// TODO:  Since we're using power-of-two modulo, consider: x % 2n ==> x & (2n - 1), or in our case: x % 2 ==> x & 1
 int main(int argc, char **argv) {
   // Let's make it work first.
   Options opts = process_options(argc, argv);

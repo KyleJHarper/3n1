@@ -1,23 +1,96 @@
-Stand-in for a TODO list currently.
-
 Wondering if there's a way to optimize the brute-force techniques employed to test the 3n+1 (collatz) testing.
 
-As of this writing (2021) the space tested was 0 - 2^68 (2.95 x 10^20, or simply 2.95e20), and the documented rates (in tests/sec) of computation were:
-* 1.31 x 10^12  (GPU-based, 64-bit int)
-* 2.20 x 10^11  (GPU-based, 128-bit int)
-* 5.25 x 10^ 9  (x86 CPU, 64-bit)
-* 4.21 x 10^ 9  (x64 CPU, 128-bit)
+As of this writing (2021) the space tested was 0 - 2^68 (2.95 x 10^20, or simply 2.95e20), and the documented rates (in tests/sec) of
+computation were:
+Authors | Sieve(1) | Numbers(2) | Speed | Hardware | Architecture
+------- | -------- | ---------- | ----- | -------- | ------------
+Honda et al. | 2^37 | 64-bit | 1.31 e12 | GTX Titan X | GPU
+Honda et al. | 2^37 | 64-bit | 5.25 e9 | i7-4790 | CPU
+Roosendaal | 2^32 | 64-bit | 4.63 e8 | Contemporary CPUs(3) | CPU
+Oliveira et al. | 2^46 | 64-bit | 2.25 e9 | CPUs circa 2004-2009 | CPU
+Barina | 2^34 | 128-bit | 4.21 e9 | Xeon Gold 5218 | CPU
+Barina | 2^24 | 128-bit | 2.20 e11 | RTX 2080 | GPU
+
+(1) I'm guessing the sieve was for Base2?  At this point, I haven't delved into sieves yet.
+
+(2) Means width.
+
+(3) No idea what this means.
+
 
 (Details at: https://www.semanticscholar.org/paper/Convergence-verification-of-the-Collatz-problem-Barina/0dc674cb2c6d9a7d85621d77287fb009458eeaa9/figure/0)
 
-# Potential Uselessness
-It should be noted that this endeavor is possibly useless.  Even if we are able to test the space beyond 2^68, if it doesn't mean we'll find anything.
+# Big Disclaimer
+I am not a mathematician.
+
+I am a computer engineer.  This goal is learning.
+
+The general approach to brute forcing isn't actually a brute force.  Very smart people are using sieves and other techniques to avoid
+testing numbers that can be mathematically proved to end back at 1.  My aim is to test the optimizations themselves and generate data to
+identify which optimizations are most efficient (highest rejections per unit of CPU time).  A natural byproduct of this approach will be an
+ever-faster method of testing 3n1 spaces.  I believe there are other optimizations that may have been overlooked which are computer-related
+rather than math-related.
+
+tl;dr - This is (currently) a hobby project.
+
+## Potential Uselessness
+It should be noted that this endeavor is possibly useless.  Even if we are able to test the space beyond 2^68, if it doesn't mean we'll
+find anything.
 
 If we find nothing (no counterexample), we still haven't proven anything.
 
 The goal of this project is as much about optimization as it is about an old math conjecture.
 
-### Areas of focus
+# Areas of focus
+## Breakdown Of Optimization Cost
+Optimizations come at a cost.  Consider two optimizations, O-1 and O-2.  If they possess equal rejection rates and computation cost, then
+they can be used in any order.  But if one offers more rejection percentage per unit of computation, it is superior (assuming short-circuit
+logic, which is reasonable).
+
+Example:
+* Givens: a set of N terms is 100 and the cost to compute is 20 units.  O-1 and O-2 are 10 units each.
+* O-1 will be applied to all 100 terms, costing 1000 units.
+* O-2 will only be applied to 10 terms, costing 100 units.
+* Only 1 term will survive optimization, costing 20 units.
+
+Total Cost: 1120.
+
+Example 2:
+* Same as first, except O-2 only costs 5 units but its rejection rate is 70%.
+* O-1 applies to 100 terms, rejects 90, and still costs 1000.
+* O-2 applies to 10 terms, rejects 7, and costs 50.
+* 3 terms survive and cost 60.
+
+Total Cost: 1100
+
+Example 2-1:
+* Same as example 2, except we apply O-2 first.
+* O-2 applies to 100 terms, rejects 70, and costs 500.
+* O-1 applies to 30 terms, rejects 90%, and costs 300.
+* 3 terms survive again, costing 60.
+
+Total Cost: 860
+
+In the above examples, if we'd simply brute-forced every term, it would have cost 100 * 20 == 2000 units.  Our "90%" optimization does not
+mean we reduce our computational load by 90%.  In fact, the more time we commit to processing an optimization, the higher our "floor"
+raises.  E.g.: an optimization that is 100% efficient and costs 5 units will never be faster than "500".  Computers are extremely sensitive
+to cache misses and many optimizations center around cache hit ratios, cache (line) optimization, avoiding RAM, branch mispredictions,
+pipeline flushing, etc.
+
+As an added spur in my butt, the efficiency of these optimizations may change as the number of terms increases or the terms become large
+numbers.  Even if an optimization is mathematically guaranteed (not just probabilistic), the amount of work a computer has to do may change
+(e.g.: losing a microcode optimization when term N grows from a 64-bit item to a 128-bit).
+
+Therefore, our first area of focus is to study how efficient optimizations are, and to decide if there are methods for grouping up the work
+into tighter, higher-throughput regions.
+
+## Existing Optimizations and Techniques
+These are techniques already in use, or at least mentioned by others, which I need to look into.
+
+
+## Random Ideas From My Brain
+The following are considerations I'm toying with.  I'm sure many (possibly all) of these have been considered by others.
+
 * Stop recursing, it's inefficient.
 * Minimize memory writing.  Stop tracking steps and max values and other crap we don't care about for space testing.
 * Parallelize the work, each test (number) is atomic.  And our assumption below (about testing lower numbers) is proved when each block completes.

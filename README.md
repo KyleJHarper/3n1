@@ -87,6 +87,11 @@ into tighter, higher-throughput regions.
 ## Existing Optimizations and Techniques
 These are techniques already in use, or at least mentioned by others, which I need to look into.
 
+* Sieves.  I've seen 2-mod, 3-mod, and others, but I admittedly don't know what they are yet.  I believe these are time-memory tradeoffs,
+which I do have experience with, but lack the exposure to here.
+* Hardware.  Other architectures (such as GPUs) offer great parallelization efficiency.  I'm guessing an FPGA or ASIC would be even better,
+but would cost a fortune of course.
+* The author at https://github.com/hellpig/collatz has a lot of techniques documented--with lots of exclamation points!!!! :)
 
 ## Random Ideas From My Brain
 The following are considerations I'm toying with.  I'm sure many (possibly all) of these have been considered by others.

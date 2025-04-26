@@ -1,8 +1,9 @@
-CC     = gcc
-CFLAGS += -Wall -Wextra -std=gnu99 -pthread
+CC     = g++
+CFLAGS += -Wall -Wextra -std=c++20 -pthread -O2
 
 SRCDIR = src
 BINDIR = bin
+EXPDIR = $(SRCDIR)/experiments
 
 SOURCES := $(wildcard $(SRCDIR)/*.c)
 
@@ -11,11 +12,9 @@ build:
 	$(MAKE) 3n1
 
 3n1:
-	$(CC) $(CFLAGS) -O3 -o $(BINDIR)/3n1 \
-		$(SRCDIR)/helpers.c      \
-		$(SRCDIR)/error.c        \
-		$(SRCDIR)/options.c      \
-		$(SRCDIR)/3n1.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/3n1 \
+		$(EXPDIR)/experiment_a1.cpp \
+		$(SRCDIR)/3n1.cpp
 
 clean:
 	rm -f $(BINDIR)/*

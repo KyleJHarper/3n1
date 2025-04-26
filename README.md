@@ -128,3 +128,12 @@ results in us dividing by 2, taking us back to N).
   * Note: this might become inefficient to track as numbers get larger and as duplicates are found from previous iterations of X.  However
     we might avoid this if we chunk up the ranges reasonably and put them in a sorted datastructure (vla-ish, skiplist, etc) that will give us
     reasonable search performance (reasonable meaning, better to check each time than brute force everything).
+
+# Tests
+ID | Code Name | Description
+------- | -------- | ----------
+A1 | Blind | A literal interpretation of the rules.
+
+## A1 - Blind
+We start with a literal interpretation of the rules and do not deviate.  Evens are halved, odds
+are multiplied by 3 and added with 1.  Then we loop.
